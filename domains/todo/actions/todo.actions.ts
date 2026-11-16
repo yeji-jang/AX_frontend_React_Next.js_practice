@@ -179,4 +179,8 @@ export async function changeTodoStatus(
                 `할일을 찾을 수 없거나 수정 권한이 없습니다. - ID: ${id}`,
         );
     }
+
+    // 목록 페이지를 다시 렌더링해서 TodoDashBoard가 최신 initialItems를 받도록 합니다.
+    // (Server Action 응답에 새 화면 데이터가 함께 실려 와서 추가 요청이 없습니다.)
+    revalidatePath('/', 'page');
 }

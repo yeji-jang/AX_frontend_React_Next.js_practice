@@ -1,4 +1,5 @@
-'use server';
+// 서버 컴포넌트에서만 사용하는 조회 함수입니다.
+// ('use server'는 브라우저에서 호출 가능한 Server Action에만 붙이므로 여기서는 쓰지 않습니다.)
 
 import { getCurrentUser } from '@/domains/auth/queries/getCurrentUser.query';
 import { createServerClient } from '@/shared/lib/supabase';

@@ -1,10 +1,9 @@
 'use client';
 
-import { produce } from 'immer';
 import EmptyState from '@/shared/components/EmptyState';
 import { Button } from '@/shared/components/ui/button';
 import Link from 'next/link';
-import { useOptimistic, useState, useTransition } from 'react';
+import { useOptimistic, useTransition } from 'react';
 import { changeTodoStatus } from '../actions/todo.actions';
 import type { Todo, TodoStatus } from '../types/todo.types';
 import { STATUS_ORDER, TODO_STATUS_MAP } from '../constants/todoStatus';
@@ -22,12 +21,13 @@ interface OptimisticUpdateType {
 export default function TodoDashBoard({
     initialItems,
 }: TodoDashBoardProps): React.JSX.Element {
-    const [items, setItems] = useState<Todo[]>(initialItems);
     const [isPending, startTransition] = useTransition();
 
     // 낙관적 상태 관리 훅
+    // Props(initialItems)를 useState에 복사하지 않고 그대로 기준값으로 사용합니다.
+    // → 서버가 revalidatePath로 새 목록을 보내면 화면이 자동으로 최신 상태가 됩니다. (상태 꼬임 방지)
     const [optimisticItems, setOptimisticItems] = useOptimistic(
-        items,
+        initialItems,
         (currentItems, { id, nextStatus }: OptimisticUpdateType) =>
             currentItems.map((item) =>
                 item.id === id ? { ...item, status: nextStatus } : item,
@@ -36,7 +36,7 @@ export default function TodoDashBoard({
 
     const onClick = (id: string, status: TodoStatus) => {
         // 이미 동일한 상태인 경우 불필요한 요청 방지
-        const currentItem = items.find((item) => item.id === id);
+        const currentItem = optimisticItems.find((item) => item.id === id);
         if (currentItem && currentItem.status === status) {
             return;
         }
@@ -45,17 +45,10 @@ export default function TodoDashBoard({
             // UI 즉시 반영(낙관적 상태로 선반영)
             setOptimisticItems({ id, nextStatus: status });
             try {
-                // 서버에 상태 반영
+                // 서버에 상태 반영 → 서버가 revalidatePath로 최신 목록(initialItems)을 다시 보내 줍니다.
                 await changeTodoStatus(id, status);
-
-                // 서버에 반영 성공 시 실제 상태 동기화
-                setItems(produce(draft => {
-                    const item = draft.find(item => item.id === id) ;
-                    if (item) item.status = status;
-                }));
-
             } catch (error) {
-                // 실패 시 startTransition이 종료 되면서 자동으로 items(원래 상태)로 롤백됨
+                // 실패 시 startTransition이 끝나면서 자동으로 initialItems(원래 상태)로 롤백됨
                 console.error('상태 변경 실패:', error);
                 alert(
                     '할일 상태 변경에 실패하였습니다. 잠시 후 다시 시도하세요.',

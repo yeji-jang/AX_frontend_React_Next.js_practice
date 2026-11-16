@@ -13,8 +13,11 @@ export default async function Header(): Promise<React.JSX.Element> {
 
     return (
         <header className="flex justify-between p-3 bg-indigo-100 mb-4 items-center">
-            <div>로고로 채워주세요.</div>
-            <div>
+            {/* 로고: 누르면 할 일 목록(홈)으로 이동 */}
+            <Link href="/" className="text-lg font-bold text-indigo-900">
+                📝 My Todo
+            </Link>
+            <div className="flex items-center gap-2 text-sm">
                 {user ? (
                     <>
                         <FiUser className="h-3.5 w-3.5 text-blue-600" />

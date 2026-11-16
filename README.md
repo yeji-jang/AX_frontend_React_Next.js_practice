@@ -28,6 +28,7 @@ Supabase Auth · Database를 연동해 고도화한 프로젝트입니다.
 - [라우팅 구조](#-라우팅-구조)
 - [렌더링 전략](#-렌더링-전략)
 - [시작하기](#-시작하기)
+- [과제 요구사항별 구현 내용](#-과제-요구사항별-구현-내용)
 - [진행 현황 & 남은 작업](#-진행-현황--남은-작업)
 
 ---
@@ -72,10 +73,15 @@ Supabase Auth · Database를 연동해 고도화한 프로젝트입니다.
 │       ├── page.tsx               # 할 일 목록 (메인)
 │       ├── sign_in/               # 로그인
 │       ├── sign_up/               # 회원가입
+│       ├── loading.tsx            # 로딩 UI (스켈레톤)
+│       ├── error.tsx              # 오류 UI (다시 시도)
 │       └── todo/
 │           ├── new/               # 할 일 등록
 │           ├── pin/               # 찜 목록
-│           └── [id]/view/         # 할 일 상세 (동적 라우트)
+│           └── [id]/              # 동적 라우트
+│               ├── view/          # 할 일 상세
+│               ├── edit/          # 할 일 수정
+│               └── not-found.tsx  # 없는 할 일
 │
 ├── domains/
 │   ├── auth/
@@ -85,15 +91,17 @@ Supabase Auth · Database를 연동해 고도화한 프로젝트입니다.
 │   │   ├── types/
 │   │   └── utils/                 # 입력값 유효성 검사
 │   └── todo/
-│       ├── actions/               # 등록·상태 변경 Server Actions
-│       ├── components/            # TodoDashBoard, TodoItems, TodoForm
+│       ├── actions/               # 등록·수정·삭제·상태 변경 Server Actions
+│       ├── components/            # TodoDashBoard, TodoItems, TodoForm, TodoDetail, DeleteTodoButton ...
+│       ├── constants/             # 상태 이름표 (서버·클라이언트 공용)
+│       ├── hooks/                 # usePinnedTodos (useEffect 커스텀 훅)
 │       ├── queries/               # getTodos, getTodoById
 │       ├── stores/                # usePinStore (Zustand)
 │       ├── types/
 │       └── utils/                 # DB 응답 변환, 유효성 검사
 │
 ├── shared/
-│   ├── components/                # Header, TiptapEditor, ui(shadcn)
+│   ├── components/                # Header, EmptyState, TiptapEditor, ui(shadcn)
 │   ├── lib/                       # Supabase 클라이언트, 세션 미들웨어
 │   └── types/                     # 공통 ActionState 타입
 │
@@ -169,6 +177,19 @@ npm run dev
 
 ---
 
+## 🎯 과제 요구사항별 구현 내용
+
+| 요구사항 | 구현 내용 | 관련 파일 |
+| --- | --- | --- |
+| **컴포넌트 분리 & Props** | 기능 단위 분리(`TodoDashBoard` → `TodoItems` → `TodoItem`), 모든 Props에 `interface` 타입 지정. 재사용 컴포넌트: `EmptyState`(목록·찜·404에서 재사용), `TodoForm`(`todo` Props 유무로 등록/수정 겸용) | `domains/todo/components/`, `shared/components/EmptyState.tsx` |
+| **Hook & 비동기 처리** | `useState`·`useEffect`·`useCallback`·`useTransition`·`useOptimistic`·`useActionState`. 커스텀 훅 `usePinnedTodos`는 의존성 배열에 문자열 키 사용, 클린업에서 `AbortController`로 요청 취소. Props를 State에 복사하지 않아 상태 꼬임 방지 | `domains/todo/hooks/usePinnedTodos.ts`, `TodoDashBoard.tsx`, `TodoForm.tsx` |
+| **상태별 UI (조건부·목록 렌더링)** | 로딩(`loading.tsx`, `Suspense` 스켈레톤), 오류(`error.tsx` + 다시 시도), 빈 데이터(`EmptyState`), 성공(`map` + 고유 `id`/`status` key) | `app/(todo)/loading.tsx`, `app/(todo)/error.tsx`, `todo/pin/page.tsx` |
+| **라우팅** | 파일 기반 라우팅 + 라우트 그룹 `(todo)`, 동적 라우트 `/todo/[id]/view`, `/todo/[id]/edit`. `params`(Promise) 처리, 없는 id는 `notFound()`, 삭제 후 `router.replace`로 뒤로 가기 방지, 로그인 후 `redirectUrl`로 원래 페이지 복귀 | `app/(todo)/todo/[id]/`, `proxy.ts` |
+| **서버/클라이언트 구분 & 데이터 연동** | 조회는 서버 컴포넌트(빠른 첫 화면, 번들 감소), 상호작용만 클라이언트로 분리. 변경은 Server Action + `revalidatePath`. 브라우저에만 있는 데이터(찜 id)는 클라이언트에서 `useEffect`로 조회 → [렌더링 전략](#-렌더링-전략) 참고 | `domains/*/actions/`, `domains/*/queries/` |
+| **인증 & 회원 전용 화면** | Supabase Auth(이메일·비밀번호), `proxy.ts`에서 세션 검증 후 미인증 사용자 리다이렉트, 모든 쿼리·액션에서 `user_id`로 본인 데이터만 접근 | `domains/auth/`, `shared/lib/supabaseMiddleware.ts` |
+
+---
+
 ## 📋 진행 현황 & 남은 작업
 
 ### ✅ 완료
@@ -208,6 +229,9 @@ npm run dev
 
 ### 🧹 정리
 
-- [ ] Header의 "로고로 채워주세요." 문구를 실제 로고로 교체
-- [ ] 중복 파일 정리 (`shared/lib/cn.ts`, `shared/utils/cn.ts`)
+- [x] Header의 "로고로 채워주세요." 문구를 실제 로고(홈 링크)로 교체
+- [x] 사용하지 않는 중복 파일 삭제 (`shared/lib/cn.ts`)
 - [x] `npm run build`로 경고 확인 (Next 16의 `middleware.ts` → `proxy.ts` 변경 완료)
+- [x] `TodoDashBoard`에서 Props를 `useState`에 복사하던 코드 제거 → `useOptimistic(initialItems)` + `revalidatePath`로 서버 데이터와 동기화
+- [x] 조회 함수(`getTodos`, `getTodoById`)의 불필요한 `'use server'` 제거 (Server Action에만 사용)
+- [x] `tsc`, `eslint`, `next build` 모두 오류·경고 0개
