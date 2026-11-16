@@ -54,7 +54,7 @@ Supabase Auth · Database를 연동해 고도화한 프로젝트입니다.
 | Framework | Next.js 16 (App Router), React 19 |
 | Language | TypeScript |
 | BaaS | Supabase (`@supabase/ssr`, `@supabase/supabase-js`) |
-| State | React Hooks (`useState`, `useOptimistic`, `useActionState`, `useTransition`), Zustand, Immer |
+| State | React Hooks (`useState`, `useEffect`, `useCallback`, `useOptimistic`, `useActionState`, `useTransition`, 커스텀 훅), Zustand, Immer |
 | Styling | Tailwind CSS 4, shadcn/ui, lucide-react, react-icons |
 | Editor | Tiptap |
 | Deploy | Vercel |
@@ -124,12 +124,18 @@ Supabase Auth · Database를 연동해 고도화한 프로젝트입니다.
 | `Header` | 🖥️ Server | 쿠키 기반 세션을 서버에서 읽어 로그인 상태에 맞는 UI를 바로 렌더링 |
 | `TodoDashBoard`, `TodoItems` | 💻 Client | 상태 변경 클릭, 낙관적 업데이트(`useOptimistic`) 등 사용자 상호작용 담당 |
 | `TodoForm`, `SignInForm`, `SignUpForm` | 💻 Client | 입력값 제어, `useActionState`로 Server Action 결과(오류 메시지) 표시 |
-| `/todo/pin` | 💻 Client | 브라우저 저장소에 보관된 Zustand 찜 데이터를 읽어 표시 |
+| `/todo/[id]/view`, `TodoDetail` | 🖥️ Server | `params`의 id로 서버에서 조회 → 완성된 HTML 전송. id가 필요한 부분만 `<Suspense>`로 감싸 껍데기는 즉시 표시 |
+| `TodoContentViewer`, `DeleteTodoButton` | 💻 Client | Tiptap(브라우저 전용) 표시, 삭제 확인 창·진행 상태 등 상호작용만 클라이언트로 분리 |
+| `/todo/pin` | 💻 Client | 찜한 id는 브라우저 저장소에만 있어 서버가 알 수 없음 → 브라우저에서 id를 읽은 뒤 `usePinnedTodos`(`useEffect`)로 Supabase에서 최신 정보 조회 |
 
 **데이터 흐름**
 
 - **조회**: 서버 컴포넌트에서 데이터를 가져와 클라이언트 컴포넌트에 `initialItems` Props로 전달
 - **변경**: Server Action으로 처리 후 `revalidatePath`로 화면 갱신
+- **클라이언트 조회**: 찜 목록은 커스텀 훅 `usePinnedTodos`에서 `useEffect`로 조회
+  - 의존성 배열에는 배열 대신 문자열 키(`idsKey`)를 넣어 id 목록이 실제로 바뀔 때만 재요청
+  - 클린업 함수에서 `AbortController`로 이전 요청을 취소해 늦게 도착한 응답이 화면을 덮어쓰지 않도록 처리
+  - 로딩 / 성공 / 오류 / 빈 데이터 4가지 상태를 반환하고, `retry`로 다시 시도
 - **인증**: `getCurrentUser`를 React `cache`로 감싸 한 요청 안에서 여러 번 호출해도 Supabase 조회는 한 번만 수행
 
 ---
@@ -177,6 +183,7 @@ npm run dev
 - [x] 할 일 등록 (Tiptap 에디터, 필드별 오류 메시지)
 - [x] 할 일 상태 변경 (낙관적 업데이트 + 실패 시 롤백)
 - [x] 찜하기 / 찜 목록 (Zustand)
+- [x] 찜 목록 최신 정보 조회: 커스텀 훅 `usePinnedTodos` (`useEffect` + 클린업 + 상태별 UI)
 
 ### 🔥 필수
 

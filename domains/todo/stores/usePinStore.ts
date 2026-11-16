@@ -6,7 +6,7 @@ import { immer } from 'zustand/middleware/immer';
 import type { PinStore } from "../types/pin.types";
 import type { Todo } from "../types/todo.types";
 
-export const usePinStore = create<PinStore>()(persist(immer((set, get) => ({
+export const usePinStore = create<PinStore>()(persist(immer((set) => ({
     items: [],
     _hasHydrated: false,
     setHasHydrated: (state: boolean) => {
