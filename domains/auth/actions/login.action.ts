@@ -43,7 +43,8 @@ export async function signInAction(
         .eq('id', authData.user.id)
         .single();
 
-    if (!profile || profile.deletedAt) {
+    // DB 컬럼명은 snake_case(deleted_at)입니다.
+    if (!profile || profile.deleted_at) {
         await supabase.auth.signOut();
         return {
             success: false,
