@@ -176,9 +176,10 @@ npm run dev
 
 ### 🔥 필수
 
-- [ ] **할 일 상세 페이지 구현** (`/todo/[id]/view`)
-  - `params`에서 `id`를 받아 `getTodoById`로 조회
-  - 존재하지 않는 id는 `notFound()` 처리
+- [x] **할 일 상세 페이지 구현** (`/todo/[id]/view`)
+  - [x] `params`(Promise)에서 `id`를 받아 `getTodoById`로 조회, `<Suspense>`로 로딩 처리
+  - [x] 존재하지 않는 id는 `notFound()` → `[id]/not-found.tsx` 표시
+  - [x] 내용은 Tiptap 읽기 전용 뷰어(`TodoContentViewer`)로 안전하게 표시
 - [x] **상태별 UI 처리**
   - [x] 로딩: `loading.tsx` 추가 (스켈레톤 UI)
   - [x] 오류: `error.tsx` 추가, 조회 실패 시 빈 배열 대신 오류를 던지도록 `getTodos` 수정

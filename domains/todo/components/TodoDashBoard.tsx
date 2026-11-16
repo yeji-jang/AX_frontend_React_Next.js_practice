@@ -7,10 +7,8 @@ import Link from 'next/link';
 import { useOptimistic, useState, useTransition } from 'react';
 import { changeTodoStatus } from '../actions/todo.actions';
 import type { Todo, TodoStatus } from '../types/todo.types';
-import TodoItems, { TODO_STATUS_MAP } from './TodoItems';
-
-// 화면에 보여줄 상태 순서
-const STATUS_ORDER: TodoStatus[] = ['READY', 'PROGRESS', 'DONE'];
+import { STATUS_ORDER, TODO_STATUS_MAP } from '../constants/todoStatus';
+import TodoItems from './TodoItems';
 
 interface TodoDashBoardProps {
     initialItems: Todo[];

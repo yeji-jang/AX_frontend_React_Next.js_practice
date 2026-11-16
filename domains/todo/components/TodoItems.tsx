@@ -3,13 +3,8 @@
 import { Button } from '@/shared/components/ui/button';
 import Link from 'next/link';
 import { usePinStore } from '../stores/usePinStore';
+import { TODO_STATUS_MAP } from '../constants/todoStatus';
 import type { Todo, TodoStatus } from '../types/todo.types';
-
-export const TODO_STATUS_MAP: Record<TodoStatus, string> = {
-    READY: '준비중',
-    PROGRESS: '진행중',
-    DONE: '완료',
-} as const;
 
 interface TodoItemsProps {
     status: TodoStatus;
