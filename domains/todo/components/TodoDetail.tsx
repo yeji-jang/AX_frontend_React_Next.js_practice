@@ -1,6 +1,9 @@
 // 서버 컴포넌트: 서버에서 Supabase로 할 일 1개를 조회해 HTML로 만들어 보냅니다.
 // → 브라우저는 완성된 화면을 바로 받으므로 첫 화면이 빠르고, 조회 코드가 브라우저로 전송되지 않습니다.
+import { Button } from '@/shared/components/ui/button';
+import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import { FiEdit2 } from 'react-icons/fi';
 import { TODO_STATUS_MAP } from '../constants/todoStatus';
 import { getTodoById } from '../queries/getTodoById.query';
 import DeleteTodoButton from './DeleteTodoButton';
@@ -38,8 +41,16 @@ export default async function TodoDetail({
                 <span className="inline-block rounded-full bg-muted px-3 py-1 text-xs font-medium">
                     {TODO_STATUS_MAP[todo.status]}
                 </span>
-                {/* 서버 컴포넌트 안에 클라이언트 컴포넌트를 넣고, 필요한 값만 Props로 전달합니다. */}
-                <DeleteTodoButton id={todo.id} title={todo.title} />
+                <div className="flex items-start gap-2">
+                    <Link href={`/todo/${todo.id}/edit`}>
+                        <Button variant="outline" size="sm">
+                            <FiEdit2 />
+                            수정
+                        </Button>
+                    </Link>
+                    {/* 서버 컴포넌트 안에 클라이언트 컴포넌트를 넣고, 필요한 값만 Props로 전달합니다. */}
+                    <DeleteTodoButton id={todo.id} title={todo.title} />
+                </div>
             </div>
             <h1 className="mb-4 text-2xl font-bold">{todo.title}</h1>
 

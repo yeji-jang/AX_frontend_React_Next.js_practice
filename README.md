@@ -40,6 +40,9 @@ Supabase Auth · Database를 연동해 고도화한 프로젝트입니다.
 | 🛡️ **회원 전용 접근 제어** | Proxy(`proxy.ts`, 구 Middleware)에서 세션을 검증해 미인증 사용자를 `/sign_in?redirectUrl=...`로 리다이렉트 |
 | ✅ **할 일 등록** | `useActionState` + Server Action, Tiptap 리치 텍스트 에디터, 필드별 유효성 검사 |
 | 🔄 **상태 변경** | 준비중 → 진행중 → 완료, `useOptimistic`으로 즉시 반영 후 실패 시 자동 롤백 |
+| 🔍 **상세 보기** | 동적 라우트 `/todo/[id]/view`, 없는 할 일은 `notFound()` 처리 |
+| ✏️ **수정 / 🗑️ 삭제** | 등록 폼을 Props로 재사용한 수정 화면, 확인 창 후 soft delete |
+| ⏳ **상태별 UI** | `loading.tsx`(스켈레톤), `error.tsx`(다시 시도), `EmptyState`(빈 목록 안내) |
 | ⭐ **찜하기** | Zustand persist 스토어로 찜 목록 관리 (`/todo/pin`) |
 
 ---
@@ -106,7 +109,8 @@ Supabase Auth · Database를 연동해 고도화한 프로젝트입니다.
 | `/` | 할 일 목록 | 🔒 회원 |
 | `/todo/new` | 할 일 등록 | 🔒 회원 |
 | `/todo/pin` | 찜 목록 | 🔒 회원 |
-| `/todo/[id]/view` | 할 일 상세 | 🔒 회원 |
+| `/todo/[id]/view` | 할 일 상세 (수정·삭제 버튼) | 🔒 회원 |
+| `/todo/[id]/edit` | 할 일 수정 | 🔒 회원 |
 | `/sign_in` | 로그인 | 🔓 비회원 (로그인 상태면 `/`로 이동) |
 | `/sign_up` | 회원가입 | 🔓 비회원 (로그인 상태면 `/`로 이동) |
 
@@ -184,9 +188,9 @@ npm run dev
   - [x] 로딩: `loading.tsx` 추가 (스켈레톤 UI)
   - [x] 오류: `error.tsx` 추가, 조회 실패 시 빈 배열 대신 오류를 던지도록 `getTodos` 수정
   - [x] 빈 데이터: 재사용 컴포넌트 `EmptyState`로 안내 문구 표시 (메인 목록, 찜 목록)
-- [ ] **할 일 수정 · 삭제 기능** (상세 페이지에서 처리)
+- [x] **할 일 수정 · 삭제 기능** (상세 페이지에서 처리)
   - [x] 삭제: `deleteTodoAction`(soft delete, `deleted_at` 기록) + 확인 창 + 찜 목록에서도 제거
-  - [ ] 수정
+  - [x] 수정: `/todo/[id]/edit` + `updateTodoAction`, 등록 폼(`TodoForm`)을 `todo` Props로 재사용
 
 ### 🚀 배포
 
