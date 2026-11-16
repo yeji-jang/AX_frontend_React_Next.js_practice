@@ -14,7 +14,7 @@ Supabase Auth · Database를 연동해 고도화한 프로젝트입니다.
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4-06B6D4?logo=tailwindcss&logoColor=white)
 ![Vercel](https://img.shields.io/badge/Vercel-Deploy-000000?logo=vercel&logoColor=white)
 
-🔗 **배포 주소**: _배포 후 추가 예정_
+🔗 **배포 주소**: [https://ax-frontend-react-next-js-practice.vercel.app](https://ax-frontend-react-next-js-practice.vercel.app)
 
 </div>
 
@@ -37,7 +37,7 @@ Supabase Auth · Database를 연동해 고도화한 프로젝트입니다.
 | 기능 | 설명 |
 | --- | --- |
 | 🔐 **회원가입 / 로그인 / 로그아웃** | Supabase Auth 이메일·비밀번호 인증, `profiles` 테이블 연동 |
-| 🛡️ **회원 전용 접근 제어** | Middleware에서 세션을 검증해 미인증 사용자를 `/sign_in?redirectUrl=...`로 리다이렉트 |
+| 🛡️ **회원 전용 접근 제어** | Proxy(`proxy.ts`, 구 Middleware)에서 세션을 검증해 미인증 사용자를 `/sign_in?redirectUrl=...`로 리다이렉트 |
 | ✅ **할 일 등록** | `useActionState` + Server Action, Tiptap 리치 텍스트 에디터, 필드별 유효성 검사 |
 | 🔄 **상태 변경** | 준비중 → 진행중 → 완료, `useOptimistic`으로 즉시 반영 후 실패 시 자동 롤백 |
 | ⭐ **찜하기** | Zustand persist 스토어로 찜 목록 관리 (`/todo/pin`) |
@@ -94,7 +94,7 @@ Supabase Auth · Database를 연동해 고도화한 프로젝트입니다.
 │   ├── lib/                       # Supabase 클라이언트, 세션 미들웨어
 │   └── types/                     # 공통 ActionState 타입
 │
-└── middleware.ts                  # 인증 세션 갱신 및 접근 제어
+└── proxy.ts                       # 인증 세션 갱신 및 접근 제어 (Next.js 16의 Middleware)
 ```
 
 ---
@@ -135,8 +135,8 @@ Supabase Auth · Database를 연동해 고도화한 프로젝트입니다.
 ### 1. 설치
 
 ```bash
-git clone https://github.com/yeji-jang/nextjs-todo-assignment.git
-cd nextjs-todo-assignment
+git clone https://github.com/yeji-jang/AX_frontend_React_Next.js_practice.git
+cd AX_frontend_React_Next.js_practice
 npm install
 ```
 
@@ -166,7 +166,9 @@ npm run dev
 - [x] Next.js App Router 기반 프로젝트 구조 구성 (도메인별 폴더 분리)
 - [x] Supabase 클라이언트 설정 (서버용 / 브라우저용)
 - [x] 회원가입 · 로그인 · 로그아웃 (Server Actions + 유효성 검사)
-- [x] Middleware 기반 회원 전용 페이지 접근 제어
+- [x] Proxy(구 Middleware) 기반 회원 전용 페이지 접근 제어
+- [x] Next.js 16 규칙에 맞춰 `middleware.ts` → `proxy.ts` 변경
+- [x] 로그인 시 탈퇴 회원 검사 버그 수정 (`deletedAt` → `deleted_at`)
 - [x] 할 일 목록 조회 (서버 컴포넌트 → Props 전달)
 - [x] 할 일 등록 (Tiptap 에디터, 필드별 오류 메시지)
 - [x] 할 일 상태 변경 (낙관적 업데이트 + 실패 시 롤백)
@@ -185,13 +187,13 @@ npm run dev
 
 ### 🚀 배포
 
-- [ ] Vercel에 GitHub 저장소 연결
-- [ ] Vercel 환경 변수 등록 (`NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`)
+- [x] Vercel에 GitHub 저장소 연결
+- [x] Vercel 환경 변수 등록 (`NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`)
 - [ ] Supabase Auth의 Site URL / Redirect URL에 배포 주소 추가
-- [ ] README 상단에 배포 주소 추가
+- [x] README 상단에 배포 주소 추가
 
 ### 🧹 정리
 
 - [ ] Header의 "로고로 채워주세요." 문구를 실제 로고로 교체
 - [ ] 중복 파일 정리 (`shared/lib/cn.ts`, `shared/utils/cn.ts`)
-- [ ] `npm run build`로 경고 확인 (Next 16의 `middleware.ts` → `proxy.ts` 변경 여부 등)
+- [x] `npm run build`로 경고 확인 (Next 16의 `middleware.ts` → `proxy.ts` 변경 완료)
