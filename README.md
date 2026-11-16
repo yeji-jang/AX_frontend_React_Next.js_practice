@@ -189,7 +189,7 @@ npm run dev
 
 - [x] Vercel에 GitHub 저장소 연결
 - [x] Vercel 환경 변수 등록 (`NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`)
-- [ ] Supabase Auth의 Site URL / Redirect URL에 배포 주소 추가
+- [x] Supabase Auth의 Site URL / Redirect URL에 배포 주소 추가
 - [x] README 상단에 배포 주소 추가
 
 ### 🧹 정리
