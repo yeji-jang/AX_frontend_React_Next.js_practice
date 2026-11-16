@@ -62,6 +62,40 @@ export async function addTodoAction(
     };
 }
 
+// 할 일 삭제 (soft delete)
+// 실제로 지우지 않고 deleted_at에 삭제 시각을 기록합니다.
+// 조회 함수들이 deleted_at이 비어 있는 것만 가져오므로 화면에서는 사라집니다.
+export async function deleteTodoAction(id: string): Promise<ActionState> {
+    const { user } = await getCurrentUser();
+    if (!user) {
+        return { success: false, message: '로그인이 필요한 서비스 입니다.' };
+    }
+
+    const supabase = createServerClient();
+    const now = new Date().toISOString();
+
+    const { data, error } = await supabase
+        .from('todos')
+        .update({ deleted_at: now, updated_at: now })
+        .eq('id', id)
+        .eq('user_id', user.id) // 내 할 일만 삭제 가능
+        .is('deleted_at', null) // 이미 삭제된 것은 제외
+        .select('id')
+        .maybeSingle();
+
+    if (error || !data) {
+        return {
+            success: false,
+            message: '할 일을 삭제하지 못했습니다. 잠시 후 다시 시도해 주세요.',
+        };
+    }
+
+    // 목록 페이지의 캐시를 갱신해서 삭제 결과가 바로 반영되게 합니다.
+    revalidatePath('/', 'page');
+
+    return { success: true, message: '할 일이 삭제되었습니다.' };
+}
+
 export async function changeTodoStatus(
     id: string,
     status: TodoStatus,

@@ -3,6 +3,7 @@
 import { notFound } from 'next/navigation';
 import { TODO_STATUS_MAP } from '../constants/todoStatus';
 import { getTodoById } from '../queries/getTodoById.query';
+import DeleteTodoButton from './DeleteTodoButton';
 import TodoContentViewer from './TodoContentViewer';
 
 interface TodoDetailProps {
@@ -33,9 +34,13 @@ export default async function TodoDetail({
 
     return (
         <article className="rounded-2xl border p-6">
-            <span className="mb-2 inline-block rounded-full bg-muted px-3 py-1 text-xs font-medium">
-                {TODO_STATUS_MAP[todo.status]}
-            </span>
+            <div className="mb-2 flex items-start justify-between gap-2">
+                <span className="inline-block rounded-full bg-muted px-3 py-1 text-xs font-medium">
+                    {TODO_STATUS_MAP[todo.status]}
+                </span>
+                {/* 서버 컴포넌트 안에 클라이언트 컴포넌트를 넣고, 필요한 값만 Props로 전달합니다. */}
+                <DeleteTodoButton id={todo.id} title={todo.title} />
+            </div>
             <h1 className="mb-4 text-2xl font-bold">{todo.title}</h1>
 
             <dl className="mb-6 grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 text-sm text-muted-foreground">

@@ -185,6 +185,8 @@ npm run dev
   - [x] 오류: `error.tsx` 추가, 조회 실패 시 빈 배열 대신 오류를 던지도록 `getTodos` 수정
   - [x] 빈 데이터: 재사용 컴포넌트 `EmptyState`로 안내 문구 표시 (메인 목록, 찜 목록)
 - [ ] **할 일 수정 · 삭제 기능** (상세 페이지에서 처리)
+  - [x] 삭제: `deleteTodoAction`(soft delete, `deleted_at` 기록) + 확인 창 + 찜 목록에서도 제거
+  - [ ] 수정
 
 ### 🚀 배포
 
