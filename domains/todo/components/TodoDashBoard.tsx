@@ -1,12 +1,16 @@
 'use client';
 
 import { produce } from 'immer';
+import EmptyState from '@/shared/components/EmptyState';
 import { Button } from '@/shared/components/ui/button';
 import Link from 'next/link';
 import { useOptimistic, useState, useTransition } from 'react';
 import { changeTodoStatus } from '../actions/todo.actions';
 import type { Todo, TodoStatus } from '../types/todo.types';
-import TodoItems from './TodoItems';
+import TodoItems, { TODO_STATUS_MAP } from './TodoItems';
+
+// 화면에 보여줄 상태 순서
+const STATUS_ORDER: TodoStatus[] = ['READY', 'PROGRESS', 'DONE'];
 
 interface TodoDashBoardProps {
     initialItems: Todo[];
@@ -79,30 +83,28 @@ export default function TodoDashBoard({
                     서버와 동기화 중...
                 </span>
             )}
-            <div className="border-b p-4 m-4">
-                <h2>준비중</h2>
-                <TodoItems
-                    status="READY"
-                    items={optimisticItems}
-                    onClick={onClick}
+            {/* 빈 데이터 상태: 할 일이 하나도 없으면 상태별 목록 대신 안내 화면을 보여줍니다. */}
+            {optimisticItems.length === 0 ? (
+                <EmptyState
+                    title="아직 등록된 할 일이 없어요."
+                    description="첫 번째 할 일을 등록해 보세요!"
+                    actionHref="/todo/new"
+                    actionLabel="할 일 등록하기"
                 />
-            </div>
-            <div className="border-b p-4 m-4">
-                <h2>진행중</h2>
-                <TodoItems
-                    status="PROGRESS"
-                    items={optimisticItems}
-                    onClick={onClick}
-                />
-            </div>
-            <div className="border-b p-4 m-4">
-                <h2>완료</h2>
-                <TodoItems
-                    status="DONE"
-                    items={optimisticItems}
-                    onClick={onClick}
-                />
-            </div>
+            ) : (
+                // 목록 렌더링: 상태 3개(준비중/진행중/완료)를 map으로 반복해서 그립니다.
+                // key에는 바뀌지 않는 고유값(status)을 사용합니다.
+                STATUS_ORDER.map((status) => (
+                    <section key={status} className="border-b p-4 m-4">
+                        <h2>{TODO_STATUS_MAP[status]}</h2>
+                        <TodoItems
+                            status={status}
+                            items={optimisticItems}
+                            onClick={onClick}
+                        />
+                    </section>
+                ))
+            )}
         </>
     );
 }

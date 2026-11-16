@@ -29,8 +29,13 @@ export default function TodoItems({
 }: TodoItemsProps) {
     const filteredItems = items.filter((item) => item.status === status);
 
+    // 이 상태(준비중/진행중/완료)에 해당하는 할 일이 없으면 짧은 안내 문구를 보여줍니다.
     if (filteredItems.length === 0) {
-        return null;
+        return (
+            <p className="py-2 text-sm text-muted-foreground">
+                {TODO_STATUS_MAP[status]} 상태의 할 일이 없어요.
+            </p>
+        );
     }
 
     return (
